@@ -8,6 +8,8 @@ use App\Http\Controllers\TreatmentController;
 use App\Http\Controllers\Dht22SensorController;
 use App\Http\Controllers\TempController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\AnswerController;
 use App\Models\Temp;
 
 Route::resource('plants', PlantController::class)->except(['create' , 'edit']);
@@ -39,11 +41,14 @@ Route::get('plant/{plant_id}/images', [TempController::class, 'getImages']);
 
 
 
-Route::middleware(['auth:sanctum'])->group(function () 
+Route::middleware(['auth:api'])->group(function () 
 {   
 Route::post('device', [DeviceController::class, 'store']);
 Route::get('device', [DeviceController::class, 'index']);
 });
+
+Route::resource('questions', QuestionController::class);
+Route::resource('questions.answers', AnswerController::class);
 
 
 
