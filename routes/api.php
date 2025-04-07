@@ -7,6 +7,8 @@ use App\Http\Controllers\DiseaseController;
 use App\Http\Controllers\TreatmentController;
 use App\Http\Controllers\Dht22SensorController;
 use App\Http\Controllers\TempController;
+use App\Http\Controllers\DeviceController;
+use App\Models\Temp;
 
 Route::resource('plants', PlantController::class)->except(['create' , 'edit']);
 Route::resource('treatments', TreatmentController::class)->except(['create' , 'edit']);
@@ -31,4 +33,17 @@ Route::group([
 
 Route::post('upload-image', [TempController::class, 'store']);
 Route::post('/register', [userController::class, 'register']);
+
+Route::get('Data',[UserController::class,'getData'])->middleware('CheckUser');
+Route::get('plant/{plant_id}/images', [TempController::class, 'getImages']);
+
+
+
+Route::middleware(['auth:sanctum'])->group(function () 
+{   
+Route::post('device', [DeviceController::class, 'store']);
+Route::get('device', [DeviceController::class, 'index']);
+});
+
+
 

@@ -9,6 +9,11 @@ class Temp extends Model
     protected $table = 'temp'; 
     protected $fillable = 
     [
-        'image_path'
+        'image_path','plant_id'
     ];
+
+    public function plant()
+    {
+        return $this->belongsTo(Plant::class);
+    }
 }

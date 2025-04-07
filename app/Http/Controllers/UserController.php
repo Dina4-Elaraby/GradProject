@@ -22,8 +22,8 @@ class UserController extends Controller
         ([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|confirmed|min:8',
-            'status'=> 'required|string|in:admin,user'         
+            'password' => 'required|min:8',
+            //'role'=> 'required|string|in:admin,user,guest,superadmin,default:guest'         
         ]);
        
         $user = User::create
@@ -31,6 +31,7 @@ class UserController extends Controller
        'name'=>$request->name,
        'email'=>$request->email,
        'password'=> bcrypt($request->password),
+       //'role'=>$request->role
         ]);
         return response()->json(['message'=>'Your register is cretaed successfully','User'=>$user], 201);
     }
@@ -145,4 +146,12 @@ public function logout()
       {
         return response()->json(['error' => 'Token is invalid'], 400);
       }
-}}
+
+      
+}
+    public function getData()
+      {
+        $user = User::all();
+        return response()->json($user, 200);
+      }
+    }

@@ -14,4 +14,9 @@ class Plant extends Model
         'plant_family',
         'care_instructions',
     ];
+
+    public function images()
+    {
+        return $this->hasMany(Temp::class);
+    }
 }

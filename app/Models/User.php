@@ -22,6 +22,11 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+    public function devices()
+    {
+        return $this->hasMany(Device::class);
+    }
+
     protected $casts = 
     [
         'email_verified_at' => 'datetime',

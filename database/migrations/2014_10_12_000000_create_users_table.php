@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('email', 191)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('status')->default('user');
+            //$table->enum('role', ['guest', 'user', 'admin', 'superadmin'])->default('');
+            $table->string('role')->default('user');
             $table->rememberToken();
             $table->timestamps();
         });
