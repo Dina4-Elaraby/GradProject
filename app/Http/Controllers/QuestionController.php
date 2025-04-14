@@ -26,6 +26,7 @@ class QuestionController extends Controller
             'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
             'body' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $question = Question::create($request->all());
@@ -41,6 +42,7 @@ class QuestionController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $question->update($request->all());

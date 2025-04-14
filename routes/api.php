@@ -10,6 +10,7 @@ use App\Http\Controllers\TempController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AnswerController;
+use App\Http\Controllers\SensorController;
 use App\Models\Temp;
 
 Route::resource('plants', PlantController::class)->except(['create' , 'edit']);
@@ -50,5 +51,5 @@ Route::get('device', [DeviceController::class, 'index']);
 Route::resource('questions', QuestionController::class);
 Route::resource('questions.answers', AnswerController::class);
 
-
+Route::apiResource('sensor', SensorController::class);
 
