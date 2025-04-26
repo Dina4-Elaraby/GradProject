@@ -11,11 +11,8 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
  
-    /**
-     * Register a User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+    #region register
+
     public function register(Request $request)
      {
         $request->validate
@@ -23,26 +20,31 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            //'role'=> 'required|string|in:admin,user,guest,superadmin,default:guest'         
+            'gender' => 'nullable|string',
+            'address' => 'required|string',
+            'birth_date' => 'nullable|date',
+            'phone' => 'nullable|string',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
        
         $user = User::create
         ([
        'name'=>$request->name,
        'email'=>$request->email,
+       'address'=>$request->address,
+       'gender'=>$request->gender,
+       'birth_date'=>$request->birth_date,
+       'phone'=>$request->phone,
+       'profile_picture'=>$request->profile_picture,
+
        'password'=> bcrypt($request->password),
-       //'role'=>$request->role
+       
         ]);
         return response()->json(['message'=>'Your register is cretaed successfully','User'=>$user], 201);
     }
-  
-  
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-   // User Login
+    #endregion
+
+   #region User Login
    public function login(Request $request)
    {
        $request->validate
@@ -70,22 +72,16 @@ class UserController extends Controller
            'token' => $token
        ]);
    }
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+   #endregion
+   
+   
+   //Test by add token to header after login, if user is logged in
     public function me()
     {
         return response()->json(Auth::user());
     }
-  
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-   
+
+#region Logout  
 public function logout()
 {
     try 
@@ -101,24 +97,14 @@ public function logout()
         return response()->json(['error' => 'Failed to logout, please try again'], 500);
     }
 }
+#endregion
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function refresh()
     {
         return $this->respondWithToken(JWTAuth::refresh(JWTAuth::getToken()));
     }
-  
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     protected function respondWithToken($token)
     {
         return response()->json
@@ -145,10 +131,8 @@ public function logout()
       catch (JWTException $e) 
       {
         return response()->json(['error' => 'Token is invalid'], 400);
-      }
-
-      
-}
+      } 
+  }
     public function getData()
       {
         $user = User::all();

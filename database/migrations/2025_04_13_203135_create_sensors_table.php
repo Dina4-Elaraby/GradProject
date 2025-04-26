@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('sensors', function (Blueprint $table) {
             $table->id();
-            $table->date('DHT_ReadingDate');         
-            $table->time('DHT_ReadingTime'); 
+            $table->datetime('DHT_Reading'); 
             $table->decimal('DHT_Temperature_C', 5, 2);
             $table->decimal('DHT_Temperature_F', 5, 2);
             $table->decimal('DHT_Humidity', 5, 2);

@@ -17,6 +17,10 @@ class Plant extends Model
 
     public function images()
     {
-        return $this->hasMany(Temp::class);
+        return $this->hasMany(Image::class);
+    }
+    public function plantChecks()
+    {
+        return $this->hasMany(PlantCheck::class);
     }
 }
