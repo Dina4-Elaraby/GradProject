@@ -11,6 +11,7 @@ use App\Models\Plant;
 
 class ImageController extends Controller
 {
+    
     public function uploadAndCheck(Request $request)
     {
     $request->validate([
@@ -35,28 +36,37 @@ class ImageController extends Controller
     ->where('p.common_name', $plant_type)
     ->select('p.common_name', 'p.scientific_name', 'p.plant_family', 'p.care_instructions')
     ->first();
-    
+
+    $plant_id = DB::table('plants')->where('common_name', $plant_type)->value('id');
 
     $imageRecord = Image::create([
         'image_path' => $path,
         'plant_type' => $plant_type,
         'diagnosis' => $plantName,
-      
-        ]);
+        'plant_id' => $plant_id 
+    ]);
 
     if ($results) {
         return response()->json([
             'Plant_type'=>$plant_type,
             'Diagnosis'=> $plantName,
-            'Data of your plant'=>$results,       
+            'Data_of_your_plant'=>$results,       
         ]);
     } else {
         return response()->json([
             'Plant_type' => $plant_type,
             'Diagnosis' => $plantName,
             'message' => 'Plant not found in database.',
-        ], 404);
+        ],200);
     }
+}
+public function delete()
+{
+    DB::table('images')->truncate();
+}
+public function remove()
+{
+
 }
     }
 

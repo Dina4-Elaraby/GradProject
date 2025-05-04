@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Image;
 class Plant extends Model
 { 
     use HasFactory;
@@ -19,8 +20,12 @@ class Plant extends Model
     {
         return $this->hasMany(Image::class);
     }
-    public function plantChecks()
+
+    public function diseases()
     {
-        return $this->hasMany(PlantCheck::class);
+        //this plant belong to many diseases,new table between them,contains two foreign keys
+        //plant_id and disease_id => orignal id,id
+        return $this->belongsToMany(Disease::class, 'plant_diseases', 'plant_id', 'disease_id', 'id', 'id');
     }
+    
 }

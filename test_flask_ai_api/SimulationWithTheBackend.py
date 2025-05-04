@@ -71,7 +71,7 @@ def classifier(image_path):
     plant_type = name_without_extension.split('_')[0] #get name after split
 
     # Step 2: Load correct model components for that plant
-    bundle_path = f"C:/wamp64/www/MyGradProject/GradProject-master/test_flask_ai_api/Bundle/Tomato_bundle.pkl"
+    bundle_path = f"C:/wamp64/www/MyGradProject/GradProject-master/test_flask_ai_api/Bundle/Pepper_bundle.pkl"
 
     bundle = joblib.load(bundle_path)
     model = bundle["model"]

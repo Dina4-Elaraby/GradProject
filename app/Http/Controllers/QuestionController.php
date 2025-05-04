@@ -2,60 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Question;
+use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        $questions = Question::all();
-        return response()->json($questions);
-    }
 
-
-    public function show($id)
-    {
-        $question = Question::with('answers')->findOrFail($id);
-        return response()->json($question);
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
-            'body' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        $question = Question::create($request->all());
-
-        return response()->json($question, 201);
-    }
-
-  
-    public function update(Request $request, $id)
-    {
-        $question = Question::findOrFail($id);
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'body' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        $question->update($request->all());
-
-        return response()->json($question);
+        $question = Question::all();
+        $question->makeHidden(['id', 'created_at', 'updated_at']);
+        return response()->json($question, 200);
     }
 
     
-    public function destroy($id)
+    public function store(Request $request)
     {
-        $question = Question::findOrFail($id);
-        $question->delete();
+        $request->validate([
+            'body'=>'required|string',
+            'image'=>'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        $path = null;
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('QuestionImages', 'public');
+        }
+        $question = Question::create([
+            'body' => $request->input('body'),
+            'image' => $path,
+            'n_likes' => 0,
+        ]);
+        return response()->json([
+            'message' => 'Question created successfully',
+            'question' => $question->body,
+            'image' => $question->image,
+            'n_likes' => $question->n_likes,
+        ], 201);
+    }
 
-        return response()->json(null, 204);
+    
+    public function edit(Question $question)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Question $question)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy( $id)
+    {
+        $question = Question::find($id);
+        $question->delete();
+        return response()->json([
+            'message' => 'Question deleted successfully',
+        ], 200);
     }
 }

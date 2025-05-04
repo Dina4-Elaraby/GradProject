@@ -2,55 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Answer;
-use App\Models\Question;
+use Illuminate\Http\Request;
 
 class AnswerController extends Controller
 {
-    public function index($questionId)
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        $answers = Answer::where('question_id', $questionId)->get();
-        return response()->json($answers);
+        //
     }
 
-  
-    public function store(Request $request, $questionId)
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
-        $request->validate([
-            'body' => 'required|string',
-        ]);
-
-        $question = Question::findOrFail($questionId);
-
-        $answer = new Answer();
-        $answer->body = $request->body;
-        $answer->question_id = $question->id;
-        $answer->save();
-
-        return response()->json($answer, 201);
+        //
     }
 
-   
-    public function update(Request $request, $id)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
-        $answer = Answer::findOrFail($id);
-
-        $request->validate([
-            'body' => 'required|string',
-        ]);
-
-        $answer->update($request->all());
-
-        return response()->json($answer);
+        //
     }
 
-  
-    public function destroy($id)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Answer $answer)
     {
-        $answer = Answer::findOrFail($id);
-        $answer->delete();
+        //
+    }
 
-        return response()->json(null, 204);
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Answer $answer)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Answer $answer)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Answer $answer)
+    {
+        //
     }
 }
