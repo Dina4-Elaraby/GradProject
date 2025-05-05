@@ -11,7 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::rename('plant_checks', 'images');
+        Schema::create('plant_checks', function (Blueprint $table) {
+            $table->id();
+            $table->string('image_path');
+            $table->string('plant_type');
+            $table->string('diagnosis');
+            
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::rename('images', 'plant_checks');
+        Schema::dropIfExists('plant_checks');
     }
 };

@@ -29,6 +29,12 @@ class Disease extends Model
         //plant_id and disease_id => orignal id,id
         return $this->belongsToMany(Plant::class, 'plant_diseases', 'disease_id', 'plant_id', 'id', 'id');
     }
+    public function treatments()
+    {
+        //this disease belong to many treatments,new table between them,contains two foreign keys
+        //treatment_id and disease_id => orignal id,id
+        return $this->belongsToMany(Treatment::class, 'treatment_diseases', 'disease_id', 'treatment_id', 'id', 'id');
+    }
 }
 
 

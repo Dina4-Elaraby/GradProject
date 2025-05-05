@@ -1,54 +1,39 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Device;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DeviceController extends Controller
 {
-    public function index()
-    {
-        return response()->json(Device::all());
-    }
-
     public function store(Request $request)
     {
-        $request->validate
-        ([
-            'name_device' => 'required|string|max:255',
-            'user_id' => 'required|exists:users,id',
-          
+        $request->validate([
+            'name' => 'required|string',
+            'mac_address' => 'required|string|unique:devices,mac_address',
         ]);
 
-        $device = Device::create
-        ([
+        // استخدم التوكين للحصول على المستخدم الحالي
+        $user = Auth::user();  // هذه الطريقة ستحصل على المستخدم بناءً على التوكين
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'No authenticated user found.',
+            ], 404);
+        }
+
+        // سجل الجهاز بناءً على المستخدم الحالي
+        $device = Device::create([
             'name' => $request->name,
-            'user_id' => $request->user_id,
-        ]);
-        return response()->json($device, 201);
-    }
-
-    public function show(Device $device)
-    {
-        return response()->json($device);
-    }
-
-    public function update(Request $request, Device $device)
-    {
-        $request->validate
-        ([
-            'name_device' => 'required|string|max:255',  
-            'user_id' => 'required|exists:users,id',
+            'mac_address' => $request->mac_address,
+            'user_id' => $user->id,
         ]);
 
-        $device->update($request->all());
-        return response()->json($device);
-    }
-
-    public function destroy(Device $device)
-    {
-        $device->delete();
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Device created successfully.',
+            'device' => $device,
+        ], 201);
     }
 }
+

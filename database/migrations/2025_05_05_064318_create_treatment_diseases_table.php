@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('plant_diseases', function (Blueprint $table) {
-           $table->integer('plant_id');
-           $table->integer('disease_id');
-
-            $table->primary(['plant_id', 'disease_id']);
-
-            $table->foreign('plant_id')->references('id')->on('plants')->onDelete('cascade');
+        Schema::create('treatment_diseases', function (Blueprint $table) {
+            $table->id();
+            $table->integer('disease_id')->unsigned();
+            $table->integer('treatment_id')->unsigned();
             $table->foreign('disease_id')->references('id')->on('diseases')->onDelete('cascade');
-           
+            $table->foreign('treatment_id')->references('id')->on('treatments')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('plant_diseases');
+        Schema::dropIfExists('treatment_diseases');
     }
 };

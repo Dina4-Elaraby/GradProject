@@ -5,13 +5,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PlantController;
 use App\Http\Controllers\DiseaseController;
 use App\Http\Controllers\TreatmentController;
-use App\Http\Controllers\Dht22SensorController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\AnswerController;
-use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\PlantDiseaseController;
+use App\Http\Controllers\TreatmentDiseaseController;
+use App\Http\Controllers\MyPlantsController;
+use App\Http\Controllers\MeasurementController;
+use App\Models\Measurement;
 
 #region user
 Route::post('/register', [userController::class, 'register']);
@@ -54,27 +55,36 @@ Route::get('/show_plant_disease', [PlantDiseaseController::class, 'index']);
 Route::post('/plant_disease', [PlantDiseaseController::class, 'GetdiseaseByPlant']);
 #endregion
 
+#region my_plants
+Route::post('/add_myplant', [MyPlantsController::class, 'store']);
+Route::get('/show_myplant', [MyPlantsController::class, 'index']);
+Route::delete('/delete_myplant/{id}', [MyPlantsController::class, 'destroy']);
+#endregion
+
+#region treatment
+Route::post('/add_treatment', [TreatmentController::class, 'store']);
+Route::get('/show_treatment', [TreatmentController::class, 'index']);
+Route::delete('/delete_treatment/{id}', [TreatmentController::class, 'destroy']);
+#endregion
+
+#region treatment_disease
+Route::post('/add_treatment_disease', [TreatmentDiseaseController::class, 'store']);
+Route::get('/show_treatment_disease', [TreatmentDiseaseController::class, 'index']);
+Route::post('/treatment_disease', [TreatmentDiseaseController::class, 'GetTreatmentByDiseaseName']);
+#endregion
 
 
-
-
-
-
-
-
-
-
-
-//Route::resource('plants', PlantController::class)->except(['create' , 'edit']);
-Route::resource('treatments', TreatmentController::class)->except(['create' , 'edit']);
-Route::resource('sensors', Dht22SensorController::class);
 Route::get('Data',[UserController::class,'getData'])->middleware('CheckUser');
-Route::post('/upload_image', [ImageController::class, 'uploadAndCheck']);
 Route::delete('/delete', [ImageController::class, 'delete']);
+Route::apiResource('measurment', Measurement::class);
+
+
+
 Route::middleware(['auth:api'])->group(function () 
 {   
 Route::post('device', [DeviceController::class, 'store']);
 Route::get('device', [DeviceController::class, 'index']);
+Route::post('/upload_image', [ImageController::class, 'uploadAndCheck']);
+
 });
-Route::apiResource('sensor', SensorController::class);
 
