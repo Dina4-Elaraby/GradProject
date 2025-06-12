@@ -14,6 +14,7 @@ class Plant extends Model
         'common_name',
         'plant_family',
         'care_instructions',
+        'image',
     ];
 
     public function images()

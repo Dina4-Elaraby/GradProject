@@ -7,64 +7,184 @@ use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
+        $questions = Question::with('user')->get();
 
-        $question = Question::all();
-        $question->makeHidden(['id', 'created_at', 'updated_at']);
-        return response()->json($question, 200);
+        $formatted = $questions->map(function ($question) {
+            return [
+                'id'    => $question->id,
+              'likes' => $question->likes,
+
+                'body'  => $question->body,
+                'image' => $question->image ? url($question->image) : null,
+                'user'  => [
+                    'id'   => $question->user->id,
+                    'name' => $question->user->name,
+                ],
+                'created_at' => $question->created_at,
+                'updated_at' => $question->updated_at,
+            ];
+        });
+
+        return response()->json($formatted);
+        
     }
 
-    
+    public function show($id)
+    {
+        $question = Question::with(['answers', 'user'])->findOrFail($id);
+
+        return response()->json([
+            'id'    => $question->id,
+         'likes' => $question->likes,
+
+            'body'  => $question->body,
+            'image' => $question->image ? url($question->image) : null,
+            'user'  => [
+                'id'   => $question->user->id,
+                'name' => $question->user->name,
+            ],
+            'answers' => $question->answers, // ممكن تعدلي ده لو عايزة تنسقيه برضو
+            'created_at' => $question->created_at,
+            'updated_at' => $question->updated_at,
+        ]);
+    }
+
     public function store(Request $request)
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+
         $request->validate([
-            'body'=>'required|string',
-            'image'=>'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+       
+            'body' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-        $path = null;
+
+        $question = new Question();
+        $question->user_id = $user->id;
+    
+        $question->body = $request->body;
+
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('QuestionImages', 'public');
+            $path = $request->file('image')->store('question_images', 'public');
+            $question->image = 'storage/' . $path;
         }
-        $question = Question::create([
-            'body' => $request->input('body'),
-            'image' => $path,
-            'n_likes' => 0,
-        ]);
+
+        $question->save();
+        $question->load('user');
+
         return response()->json([
-            'message' => 'Question created successfully',
-            'question' => $question->body,
-            'image' => $question->image,
-            'n_likes' => $question->n_likes,
+            'id'    => $question->id,
+      
+            'body'  => $question->body,
+            'image' => $question->image ? url($question->image) : null,
+            'user'  => [
+                'id'   => $question->user->id,
+                'name' => $question->user->name,
+            ],
+            'created_at' => $question->created_at,
+            'updated_at' => $question->updated_at,
         ], 201);
     }
 
-    
-    public function edit(Question $question)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $question = Question::findOrFail($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Question $question)
-    {
-        //
-    }
+        $request->validate([
+       
+            'body' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy( $id)
-    {
-        $question = Question::find($id);
-        $question->delete();
+        $question->body = $request->body;
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('question_images', 'public');
+            $question->image = 'storage/' . $path;
+        }
+
+        $question->save();
+        $question->load('user');
+
         return response()->json([
-            'message' => 'Question deleted successfully',
-        ], 200);
+            'id'    => $question->id,
+    
+            'body'  => $question->body,
+            'image' => $question->image ? url($question->image) : null,
+            'user'  => [
+                'id'   => $question->user->id,
+                'name' => $question->user->name,
+            ],
+            'created_at' => $question->created_at,
+            'updated_at' => $question->updated_at,
+        ]);
     }
+
+    public function destroy($id)
+    {
+        $question = Question::findOrFail($id);
+        $question->delete();
+
+        return response()->json(null, 204);
+    }
+
+    public function getImage($filename)
+    {
+        $path = storage_path('app/public/question_images/' . $filename);
+
+        if (file_exists($path)) {
+            return response()->json([
+                'image_url' => url('storage/question_images/' . $filename)
+            ]);
+        }
+
+        return response()->json(['error' => 'Image not found'], 404);
+    }
+    public function like($id)
+{
+    $question = Question::findOrFail($id);
+    $question->increment('likes'); // تزود اللايك 1
+    return response()->json([
+        'message' => 'Liked!',
+        'likes' => $question->likes
+    ]);
 }
+public function unlike($id)
+{
+    $question = Question::findOrFail($id);
+    if ($question->likes > 0) {
+        $question->decrement('likes'); // تقلل اللايك 1
+    }
+    return response()->json([
+        'message' => 'Unliked!',
+        'likes' => $question->likes
+    ]);
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

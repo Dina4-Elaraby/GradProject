@@ -7,26 +7,33 @@ use App\Http\Controllers\DiseaseController;
 use App\Http\Controllers\TreatmentController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\PlantDiseaseController;
 use App\Http\Controllers\TreatmentDiseaseController;
 use App\Http\Controllers\MyPlantsController;
-use App\Http\Controllers\MeasurementController;
 use App\Models\Measurement;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Http\Request;
 
 #region user
-Route::post('/register', [userController::class, 'register']);
-Route::post('/login', [userController::class, 'login']);
-Route::post('/logout', [userController::class, 'logout'])->middleware('auth:api');
-Route::post('/refresh', [userController::class, 'refresh'])->middleware('auth:api');
-Route::post('/me', [userController::class, 'me'])->middleware('auth:api');
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:api');
+Route::post('/refresh', [UserController::class, 'refresh'])->middleware('auth:api');
+Route::post('/me', [UserController::class, 'me'])->middleware('auth:api');
 Route::get('/search', [UserController::class, 'getUserByToken'])->middleware('auth:api');
+Route::post('update_profile', [UserController::class, 'updateProfile'])->middleware('auth:api');
+Route::get('Data',[UserController::class,'getData'])->middleware('CheckUser');
+
+
+//Route::Put('/edit_profile', [UserController::class, 'editprofile'])->middleware('auth:api');
 #endregion
 
 #region question
-Route::post('/add_question', [QuestionController::class, 'store']);
-Route::get('/questions', [QuestionController::class, 'index']);
-Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
+// Route::post('/add_question', [QuestionController::class, 'store']);
+// Route::get('/questions', [QuestionController::class, 'index']);
+// Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
 #endregion
 
 #region answer
@@ -39,6 +46,7 @@ Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
 Route::post('/add_plant', [PlantController::class, 'store']);
 Route::get('/show_plant', [PlantController::class, 'index']);
 Route::delete('/delete_plant/{id}', [PlantController::class, 'destroy']);
+Route::post(('/update_plant/{id}'), [PlantController::class, 'update']);
 #endregion
 
 #region diseases
@@ -73,18 +81,33 @@ Route::get('/show_treatment_disease', [TreatmentDiseaseController::class, 'index
 Route::post('/treatment_disease', [TreatmentDiseaseController::class, 'GetTreatmentByDiseaseName']);
 #endregion
 
-
-Route::get('Data',[UserController::class,'getData'])->middleware('CheckUser');
-Route::delete('/delete', [ImageController::class, 'delete']);
-Route::apiResource('measurment', Measurement::class);
-
-
-
-Route::middleware(['auth:api'])->group(function () 
-{   
-Route::post('device', [DeviceController::class, 'store']);
-Route::get('device', [DeviceController::class, 'index']);
+#region image
 Route::post('/upload_image', [ImageController::class, 'uploadAndCheck']);
+Route::delete('/delete', [ImageController::class, 'delete']);
+#endregion
 
+
+Route::resource('questions', QuestionController::class);
+Route::resource('answers', AnswerController::class);
+
+
+
+
+
+
+
+
+
+Route::post('/clear-cache', function (Request $request) {
+    if ($request->input('key') !== '123456') {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+
+    return response()->json(['message' => 'Cache cleared successfully']);
 });
 

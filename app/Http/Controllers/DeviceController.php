@@ -14,8 +14,8 @@ class DeviceController extends Controller
             'mac_address' => 'required|string|unique:devices,mac_address',
         ]);
 
-        // استخدم التوكين للحصول على المستخدم الحالي
-        $user = Auth::user();  // هذه الطريقة ستحصل على المستخدم بناءً على التوكين
+       
+        $user = Auth::user(); 
 
         if (!$user) {
             return response()->json([
@@ -23,7 +23,7 @@ class DeviceController extends Controller
             ], 404);
         }
 
-        // سجل الجهاز بناءً على المستخدم الحالي
+        
         $device = Device::create([
             'name' => $request->name,
             'mac_address' => $request->mac_address,
