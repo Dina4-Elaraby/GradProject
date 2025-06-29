@@ -11,6 +11,8 @@ class Image extends Model
         'plant_type',
         'diagnosis',
         'plant_id',
+        'second_prediction',
+        'third_prediction',
     ];
     public function plant()
     {

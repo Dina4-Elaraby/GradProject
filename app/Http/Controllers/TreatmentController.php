@@ -9,12 +9,28 @@ class TreatmentController extends Controller
 {
     public function index()
     {
-        return Treatment::all();
+        $treatments = Treatment::all();
+         return view('admin.treatments.index', compact('treatments'));
+         
+    }
+
+     public function create()
+    {
+        return view('admin.treatments.create');
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+           
+            'description' => 'required|string',
+            
+        ]);
+
+        // Create a new treatment record
       $treatment =Treatment::create ($request->all());
+      
+      return redirect()->route('admin.treatments.index')->with('success', 'Treatment created.');
       return response()->json($treatment,201);
     }
       
@@ -49,6 +65,30 @@ class TreatmentController extends Controller
         $treatment->delete();
         return response()->json(['message' => 'the Treatment is deleted'], 200); 
     }
+
+    public function edit($id)
+{
+    $treatment = Treatment::findOrFail($id);
+    return view('admin.treatments.edit', compact('treatment'));
+}
+
+public function updateDashboard(Request $request, $id)
+{
+    $treatment = Treatment::findOrFail($id);
+    $treatment->description = $request->description;
+    $treatment->save();
+
+    return redirect()->route('admin.treatments.index')->with('success', 'Treatment updated successfully.');
+}
+
+public function destroyDashboard($id)
+{
+    $treatment = Treatment::findOrFail($id);
+    $treatment->delete();
+
+    return redirect()->route('admin.treatments.index')->with('success', 'Treatment deleted successfully.');
+}
+
  
 }
 

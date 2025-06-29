@@ -213,23 +213,21 @@ for image_file in image_files:
 
         ###########       Flask API      ###########
         plant_type = top3_labels[0]
-        diagnosis= predict_disease_with_svm(cropped, plant_type)
+        diagnosis = predict_disease_with_svm(cropped, plant_type)
         @app.route('/predict', methods=['POST'])
         def predict():
-            
             if 'image' not in request.files:
-                return jsonify({'error': 'No image file uploaded'}), 400   
-            else:      
-               return jsonify({
+                return jsonify({'error': 'No image file uploaded'}), 400
+
+         
+            sorted_top3 = sorted(zip(top3_labels, top3_scores), key=lambda x: x[1], reverse=True)
+            top3_dict = {label: f"{score * 100:.2f}%" for label, score in sorted_top3}
+
+            return jsonify({
                 'plant_type': plant_type,
                 'diagnosis': diagnosis,
-               
-        })
-       
+                'top3': top3_dict
+            })
+
         if __name__ == '__main__':
-           app.run(debug=True)
-       
-
-
-    
-      
+            app.run(debug=True)

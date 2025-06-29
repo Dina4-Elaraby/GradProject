@@ -17,7 +17,7 @@ class QuestionController extends Controller
               'likes' => $question->likes,
 
                 'body'  => $question->body,
-                'image' => $question->image ? url($question->image) : null,
+                'image' => $question->image ? asset($question->image) : null,
                 'user'  => [
                     'id'   => $question->user->id,
                     'name' => $question->user->name,
@@ -40,12 +40,12 @@ class QuestionController extends Controller
          'likes' => $question->likes,
 
             'body'  => $question->body,
-            'image' => $question->image ? url($question->image) : null,
+            'image' => $question->image ? asset($question->image) : null,
             'user'  => [
                 'id'   => $question->user->id,
                 'name' => $question->user->name,
             ],
-            'answers' => $question->answers, // ممكن تعدلي ده لو عايزة تنسقيه برضو
+            'answers' => $question->answers, 
             'created_at' => $question->created_at,
             'updated_at' => $question->updated_at,
         ]);
@@ -68,7 +68,9 @@ class QuestionController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('question_images', 'public');
-            $question->image = 'storage/' . $path;
+            // $question->image = 'storage/' . $path;
+            $question->image = $path;
+
         }
 
         $question->save();

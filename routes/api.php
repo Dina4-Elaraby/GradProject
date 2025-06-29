@@ -12,6 +12,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\PlantDiseaseController;
 use App\Http\Controllers\TreatmentDiseaseController;
 use App\Http\Controllers\MyPlantsController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Models\Measurement;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
@@ -84,6 +85,12 @@ Route::post('/treatment_disease', [TreatmentDiseaseController::class, 'GetTreatm
 #region image
 Route::post('/upload_image', [ImageController::class, 'uploadAndCheck']);
 Route::delete('/delete', [ImageController::class, 'delete']);
+
+//Route::middleware('auth:api')->group(function(){ 
+Route::post('identify', [ImageController::class, 'getTop3Predictions']);
+Route::post('diagnose', [ImageController::class, 'getDiagnosis']);
+Route::post('treatment', [ImageController::class, 'getTreament']);
+//});
 #endregion
 
 
@@ -96,6 +103,9 @@ Route::resource('answers', AnswerController::class);
 
 
 
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index']);
+// Route::get('/admin/plants', [PlantController::class, 'showPlantsInDashboard'])->name('showPlantsInDashboard');
 
 
 Route::post('/clear-cache', function (Request $request) {

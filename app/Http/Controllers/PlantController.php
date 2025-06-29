@@ -29,9 +29,14 @@ class PlantController extends Controller
         ]);
        
         Plant::create($validatedData);
+        return redirect()->route('admin.plants')->with('success', 'Plant added successfully!');
         return response()->json($validatedData, 201);
 
     }
+    public function create()
+{
+    return view('admin.plants.create_plant');
+}
 
     public function show(string $id)
     {
@@ -108,4 +113,30 @@ class PlantController extends Controller
         $plant ->delete();
         return response()->json(['message'=>'The plant is deleted'],200);
     }
+
+    public function showPlantsInDashboard()
+    {
+        $plants = Plant::all();
+        return view('admin.plants.show', compact('plants'));
+    }
+        public function edit($id)
+{
+    $plant = Plant::findOrFail($id);
+    return view('admin.plants.edit', compact('plant'));
+}
+
+public function updateDashboard(Request $request, $id)
+{
+    $plant = Plant::findOrFail($id);
+    $plant->update($request->all());
+    return redirect()->route('admin.plants.show')->with('success', 'Plant updated successfully');
+}
+
+public function destroyDashboard($id)
+{
+    $plant = Plant::findOrFail($id);
+    $plant->delete();
+    return redirect()->route('admin.plants.show')->with('success', 'Plant deleted successfully');
+}
+
 }

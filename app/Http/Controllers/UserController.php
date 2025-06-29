@@ -9,6 +9,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -35,7 +36,31 @@ class UserController extends Controller
         return response()->json(['message'=>'Your register is created successfully'], 201);
     }
     #endregion
+public function create()
+{
+    return view('admin.users.create_user');
+}
 
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:6',
+        'confirm_password' => 'required|same:password',
+        'phone' => 'sometimes|required|string|max:15|min:10|unique:users,phone|regex:/^[0-9]+$/',
+        'address' => 'nullable|string',
+        'gender' => 'string|in:female,male',
+        'birth_date' => 'nullable|date|date_format:Y-m-d',
+        'role' => 'nullable|string|in:admin,user|default:user', 
+    ]);
+
+    $validated['password'] = Hash::make($validated['password']);
+
+    User::create($validated);
+
+    return redirect()->route('admin.users.show')->with('success', 'User added successfully!');
+}
    #region User Login
    public function login(Request $request)
    {
@@ -61,7 +86,20 @@ class UserController extends Controller
        return response()->json
        ([
            'message' => 'Login successful',
-           'token' => $token
+           'token' => $token,
+           'user' =>
+           [
+               
+                'name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                'phone' => Auth::user()->phone,
+                'gender' => Auth::user()->gender,
+                'address' => Auth::user()->address,
+                'birth_date' => Auth::user()->birth_date,
+                'phone' => Auth::user()->phone,
+                'profile_picture' => Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : null,
+
+           ]
        ]);
    }
    #endregion
@@ -169,28 +207,16 @@ public function logout()
             $user->password = bcrypt($request->password);
         }
 
-        if ($request->hasFile('profile_picture')) {
-    // Delete old profile picture if it exists
-    if ($user->profile_picture) {
-        $oldImagePath = str_replace(asset('storage/'), '', $user->profile_picture);
-        Storage::disk('public')->delete($oldImagePath);
-    }
-
-    // Store the image and save relative path
-    $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+        if ($request->hasFile('profile_picture')) 
+        {
    
-    $user->profile_picture = $path; // Store relative path
-}
-    // if ($request->hasFile('profile_picture')) 
-    // {
-    //     // Store the image in the public disk
-    //     $path = $request->file('profile_picture')->store('profile_picture', 'public');
+            $imageName = time() . '.' . $request->profile_picture->extension();
+            $request->profile_picture->storeAs('profile_picture', $imageName, 'public');
+            $full = storage_path('app/public/profile_picture/' . $imageName);
+            $user->profile_picture = asset('storage/profile_picture/'.$imageName);
 
-    //     // Get full URL of the image
-    //     $imageUrl = asset('storage/' . $path);
-    //     $user->profile_picture = $imageUrl;
-       
-    // } 
+        }
+    
      $user->save();
 
         return response()->json([
@@ -206,6 +232,55 @@ catch (\Exception $e)
     }
    }
    
+    public function showUsersInDashboard()
+    {
+        $users = User::all();
+        return view('admin.users.show', compact('users'));
+    }
+
+    public function edit($id)
+{
+    $user = User::findOrFail($id);
+    return view('admin.users.edit', compact('user'));
+}
+
+public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+    $user->update($request->all());
+    return redirect()->route('admin.users.show')->with('success', 'User updated successfully');
+}
+
+public function destroy($id)
+{
+    $user = User::findOrFail($id);
+    $user->delete();
+    return redirect()->route('admin.users.show')->with('success', 'User deleted successfully');
+}
+
+public function loginDashboard(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard'); 
+        } else {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Unauthorized access.');
+        }
+    }
+
+    return back()->with('error', 'Invalid credentials.');
+}
+
 }
 
     

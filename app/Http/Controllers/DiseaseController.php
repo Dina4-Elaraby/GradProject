@@ -9,7 +9,13 @@ class DiseaseController extends Controller
     public function index()
     {
         $diseases = Disease::all();
+        return view('admin.diseases.index', compact('diseases'));
         return response()->json($diseases);
+    }
+
+    public function create()
+    {
+        return view('admin.diseases.create');
     }
 
     public function store(Request $request)
@@ -20,19 +26,15 @@ class DiseaseController extends Controller
             'name' => 'required|string|max:255',
             'symptoms' => 'nullable|array',
             'factors' => 'nullable|array',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+           
             
         ]);
-        // Handle image upload
-        if ($request->hasFile('image')) 
-        {
-            $imagePath = $request->file('image')->store('Diseaseimages', 'public');
-            $validatedData['image'] = $imagePath;
-        }
+       
         
         //create a new disease
         Disease::create($validatedData);
         return response()->json(['message' => 'Disease created successfully'], 201);
+         return redirect()->route('admin.diseases')->with('success', 'Disease added successfully.');
     }
 
     public function destroy(string $id)
@@ -74,6 +76,32 @@ class DiseaseController extends Controller
         return response()->json(['message' => 'All diseases deleted successfully from DB'], 200);
     }
     
+// DiseaseController.php
+
+public function edit($id)
+{
+    $disease = Disease::findOrFail($id);
+    return view('admin.diseases.edit', compact('disease'));
+}
+
+public function update(Request $request, $id)
+{
+    $disease = Disease::findOrFail($id);
+    $disease->name = $request->name;
+    $disease->symptoms = explode(',', $request->symptoms);
+    $disease->factors = explode(',', $request->factors);
+    $disease->save();
+
+    return redirect()->route('admin.diseases.index')->with('success', 'Disease updated successfully.');
+}
+
+public function destroyDashboard($id)
+{
+    $disease = Disease::findOrFail($id);
+    $disease->delete();
+
+    return redirect()->route('admin.diseases.index')->with('success', 'Disease deleted successfully.');
+}
 
 }
 
