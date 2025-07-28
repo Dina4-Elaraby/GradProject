@@ -93,17 +93,6 @@ Route::post('treatment', [ImageController::class, 'getTreament']);
 //});
 #endregion
 
-
-Route::resource('questions', QuestionController::class);
-Route::resource('answers', AnswerController::class);
-
-
-
-
-
-
-
-
 Route::get('/admin/dashboard', [DashboardController::class, 'index']);
 // Route::get('/admin/plants', [PlantController::class, 'showPlantsInDashboard'])->name('showPlantsInDashboard');
 

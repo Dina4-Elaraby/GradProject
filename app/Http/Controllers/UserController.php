@@ -16,8 +16,8 @@ class UserController extends Controller
  
     #region register
 
-    public function register(Request $request)
-     {
+public function register(Request $request)
+{
         $request->validate
         ([
             'name' => 'required|string|max:255',
@@ -34,7 +34,7 @@ class UserController extends Controller
        
         ]);
         return response()->json(['message'=>'Your register is created successfully'], 201);
-    }
+}
     #endregion
 public function create()
 {
@@ -52,9 +52,12 @@ public function store(Request $request)
         'address' => 'nullable|string',
         'gender' => 'string|in:female,male',
         'birth_date' => 'nullable|date|date_format:Y-m-d',
-        'role' => 'nullable|string|in:admin,user|default:user', 
+        'role' => 'nullable|string|in:admin,user', 
     ]);
 
+    // Set default role if none provided
+    $validated['role'] = $validated['role'] ?? 'user';
+    
     $validated['password'] = Hash::make($validated['password']);
 
     User::create($validated);

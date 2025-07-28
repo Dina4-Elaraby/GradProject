@@ -16,14 +16,19 @@ Route::get('/login', function () {
 })->name('login');
 
 
-Route::post('/login', [UserController::class, 'loginDashboard'])->name('admin.users.login');
+// Route::post('/login', [UserController::class, 'loginDashboard'])->name('admin.users.login');
 
-Route::prefix('')->middleware(['auth', 'is_admin'])->group(function () {
+// Route::prefix('')->middleware(['auth', 'is_admin'])->group(function () {
     
 
 
  #region  Admin routes
- Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+Route::post('/admin/login', [UserController::class, 'loginDashboard'])->name('admin.login.submit');
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+
  #endregion
 
 #region Plant routes
@@ -69,4 +74,3 @@ Route::delete('/admin/treatments/{id}', [TreatmentController::class, 'destroyDas
 #endregion
 
 
-});
