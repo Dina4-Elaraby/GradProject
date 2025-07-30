@@ -11,24 +11,10 @@ use App\Http\Controllers\TreatmentController;
 use App\Models\Disease;
 
 
-Route::get('/login', function () {
-    return view('admin.users.login');
-})->name('login');
-
-
-// Route::post('/login', [UserController::class, 'loginDashboard'])->name('admin.users.login');
-
-// Route::prefix('')->middleware(['auth', 'is_admin'])->group(function () {
-    
-
-
- #region  Admin routes
-
-Route::post('/admin/login', [UserController::class, 'loginDashboard'])->name('admin.login.submit');
-
+#region admin
+Route::get('/login', function() {return view('admin.users.login');})->name('login');
+Route::post('/login', [UserController::class, 'loginDashboard'])->name('admin.users.login');
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-
-
  #endregion
 
 #region Plant routes

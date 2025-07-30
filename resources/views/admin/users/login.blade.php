@@ -58,7 +58,7 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('admin.dashboard') }}">
+        <form method="POST" action="{{ route('admin.users.login') }}">
             @csrf
 
             <div class="mb-3">
